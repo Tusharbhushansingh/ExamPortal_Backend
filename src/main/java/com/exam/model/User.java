@@ -36,6 +36,7 @@ public class User implements UserDetails{
 	private String phone;
 	private boolean enabled=true;
 	private String profile;
+	private String otp;
 	
 	//user many roles
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "user")
@@ -65,6 +66,14 @@ public class User implements UserDetails{
 		this.profile = profile;
 		this.userRoles = userRoles;
 		this.quizAttempts = quizAttempts;
+	}
+	
+	public String getOtp() {
+		return otp;
+	}
+
+	public void setOtp(String otp) {
+		this.otp = otp;
 	}
 
 	public Long getId() {

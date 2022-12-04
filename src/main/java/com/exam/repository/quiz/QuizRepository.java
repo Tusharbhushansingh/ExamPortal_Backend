@@ -30,4 +30,5 @@ public interface QuizRepository extends JpaRepository<Quiz, Long> {
 
 	public Optional<Quiz> findById(Long quizId);
 	
+	
 }

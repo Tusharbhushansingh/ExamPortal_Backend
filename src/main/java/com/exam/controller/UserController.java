@@ -15,10 +15,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.exam.model.EmailDetails;
 import com.exam.model.Role;
 import com.exam.model.User;
 import com.exam.model.UserRole;
 import com.exam.service.UserService;
+import com.exam.service.impl.EmailServiceImpl;
 
 
 @RestController
@@ -32,6 +34,9 @@ public class UserController {
 	
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
+	
+	@Autowired
+	private EmailServiceImpl emailServiceImpl;
 	
 	//creating user
 	@PostMapping("/")
@@ -71,5 +76,36 @@ public class UserController {
 	@PutMapping("/{username}")
 	public User updateUser(@RequestBody User user, @PathVariable("username") String userName) throws Exception {
 		return this.userService.updateUser(user, userName);
+	}
+	
+	//forget password
+	@PostMapping("/forget/")
+	public void forgetPassowrd(@RequestBody String email) {
+		System.out.println(email);
+		String otp = this.userService.sendOtp(email);
+		if(otp != null) {
+			EmailDetails emailDetails = new EmailDetails();
+			emailDetails.setRecipient(email);
+			emailDetails.setSubject("Otp from Exam portal");
+			emailDetails.setMsgBody("OTP =" + otp);
+
+		String status = this.emailServiceImpl.sendSimpleMail(emailDetails);
+		System.out.println(status);
+		}
+	}
+	
+	//verify Otp
+	@GetMapping("/verifyotp/{otp}/{email}")
+	public Boolean verifyOtp(@PathVariable String otp, @PathVariable String email) {
+		System.out.println(email);
+		Boolean verify_otp = this.userService.verifyOtp(otp, email);
+		System.out.println(verify_otp);
+		return verify_otp;
+	}
+	
+	//change password
+	@PutMapping("/changepassword/{password}/{email}")
+	public void passwordChange(@PathVariable String password, @PathVariable String email) {
+		this.userService.changePassword(password, email);
 	}
 }

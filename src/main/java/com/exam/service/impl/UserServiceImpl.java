@@ -1,8 +1,11 @@
 package com.exam.service.impl;
 
+import java.util.Random;
 import java.util.Set;
 
+import org.aspectj.weaver.patterns.ThisOrTargetAnnotationPointcut;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.exam.model.User;
@@ -19,6 +22,9 @@ public class UserServiceImpl implements UserService {
 	
 	@Autowired
 	private RoleRepository roleRepository;
+	
+	@Autowired
+	private BCryptPasswordEncoder bCryptPasswordEncoder;
 	
 	@Override
 	public User createUser(User user, Set<UserRole> userRoles) throws Exception {
@@ -76,6 +82,50 @@ public class UserServiceImpl implements UserService {
 		} else {
 			throw new Exception("Username not exist !!");
 		}
+	}
+
+	@Override
+	public String sendOtp(String email) {
+		System.out.println("Running hai bhai!!");
+		Random random = new Random(100000);
+		Integer otp = random.nextInt(999999);
+		System.out.println(otp);
+		
+		//save the otp 
+		User user = this.userRepository.findByEmail(email);
+		if(user != null) {
+			System.out.println("inside");
+			user.setOtp(otp.toString());
+			userRepository.save(user);
+		}
+		
+		return otp.toString();
+	}
+
+	@Override
+	public Boolean verifyOtp(String otp, String email) {
+		User user = this.userRepository.findByEmail(email);
+		System.out.println("--------------------------");
+		System.out.println(user.getOtp());
+		System.out.println("--------------------------");
+		System.out.println(otp);
+		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~");
+		if(user.getOtp().equals(otp)) {
+			System.out.println("inside true statement");
+			return true;
+		}
+		System.out.println("outside the statment");
+		return false;
+	}
+
+	@Override
+	public void changePassword(String password, String email) {
+		User user = this.userRepository.findByEmail(email);
+		if(user != null) {
+			user.setPassword(this.bCryptPasswordEncoder.encode(password));	
+			this.userRepository.save(user);
+		}
+		
 	}
 
 }

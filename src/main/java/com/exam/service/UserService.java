@@ -22,4 +22,13 @@ public interface UserService {
 	//update user
 	public User updateUser(User user, String username) throws Exception;
 	
+	//forget password logic
+	public String sendOtp(String email);
+	
+	//verify Otp
+	public Boolean verifyOtp(String otp, String email);
+	
+	//Change the password
+	public void changePassword(String password, String email);
+	
 }

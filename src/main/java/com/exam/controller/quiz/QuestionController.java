@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,12 +17,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.exam.model.quiz.Question;
 import com.exam.model.quiz.Quiz;
 import com.exam.service.quiz.QuestionService;
 import com.exam.service.quiz.QuizService;
+import com.exam.utilities.Helper;
 
 @RestController
 @CrossOrigin("*")
@@ -110,4 +114,17 @@ public class QuestionController {
 		return ResponseEntity.ok(map);
 	}
 		
+	
+	//upload question using excel
+	@PostMapping("/upload/{quizId}")
+	public ResponseEntity<?> upload(@RequestParam("file") MultipartFile file, @PathVariable Long quizId) {
+
+		if (Helper.checkExcelFormat(file)) {
+			// true
+			this.questionService.saveFromFile(file, quizId);
+			return ResponseEntity.ok(Map.of("message", "File is uploaded to Database!!"));
+		}
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please upload excel format file only.");
+	}
+
 }
